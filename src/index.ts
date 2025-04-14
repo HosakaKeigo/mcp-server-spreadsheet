@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "dotenv";
 import { registerTools } from "./tools/index.js";
+import { env } from "./env.js";
 
 // 環境変数をロード
 config();
@@ -28,6 +29,7 @@ async function main() {
     console.error("Starting MCP Spreadsheet Server...");
     await server.connect(transport);
     console.error("MCP Spreadsheet Server connected");
+    console.error("GCP Project ID:", env.GOOGLE_PROJECT_ID);
   } catch (error) {
     console.error("Failed to start MCP server:", error);
     process.exit(1);

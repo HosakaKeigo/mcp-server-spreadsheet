@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import type { sheets_v4 } from "googleapis";
 import type { SheetInfo, SpreadsheetInfo } from "../types/index.js";
+import { env } from "../env.js";
 
 /**
  * GoogleスプレッドシートAPIと通信するクライアントクラス
@@ -8,7 +9,7 @@ import type { SheetInfo, SpreadsheetInfo } from "../types/index.js";
 export class SpreadsheetClient {
   private sheets: sheets_v4.Sheets;
   // レスポンスサイズの上限（文字数）
-  private static readonly MAX_RESPONSE_SIZE = Number.parseInt(process.env.MAX_RESPONSE_SIZE ?? '30000', 10);
+  private static readonly MAX_RESPONSE_SIZE = Number.parseInt(env.MAX_RESPONSE_SIZE ?? '30000', 10);
 
   /**
    * クライアントをデフォルト認証情報で初期化
@@ -16,6 +17,7 @@ export class SpreadsheetClient {
   constructor() {
     // デフォルト認証情報を使用して認証
     const auth = new google.auth.GoogleAuth({
+      projectId: env.GOOGLE_PROJECT_ID,
       scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
     });
 
