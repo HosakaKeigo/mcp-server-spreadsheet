@@ -15,10 +15,12 @@ Google Spreadsheetsと連携するMCPサーバーです。指定されたスプ�
 
 2. 認証の設定:
    - Google CloudのApplication Default Credentialsを使用して認証を行います。
+   - Google Sheets APIがGoogle Cloudプロジェクトで有効化されているか確認してください。
 
 ```
 $gcloud auth application-default login --scopes=openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/spreadsheets
 ```
+
 
 3. プロジェクトをビルド:
    ```
@@ -33,12 +35,16 @@ $gcloud auth application-default login --scopes=openid,https://www.googleapis.co
 ## Claude for Desktopでの使用方法
 
 1. Claude for Desktopの設定ファイル(`claude_desktop_config.json`)にサーバーを追加:
+
    ```json
    {
      "mcpServers": {
        "spreadsheet": {
          "command": "node",
-         "args": ["/absolute/path/to/mcp-server-spreadsheet/build/index.js"]
+         "args": ["/absolute/path/to/mcp-server-spreadsheet/build/index.js"],
+         "env": {
+           "GOOGLE_APPLICATION_CREDENTIALS": "/absolute/path/to/your/credentials.json"
+         }
        }
      }
    }
