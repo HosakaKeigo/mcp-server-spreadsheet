@@ -8,7 +8,7 @@ import type { SheetInfo, SpreadsheetInfo } from "../types/index.js";
 export class SpreadsheetClient {
   private sheets: sheets_v4.Sheets;
   // レスポンスサイズの上限（文字数）
-  private static readonly MAX_RESPONSE_SIZE = 10000;
+  private static readonly MAX_RESPONSE_SIZE = Number.parseInt(process.env.MAX_RESPONSE_SIZE ?? '30000', 10);
 
   /**
    * クライアントをデフォルト認証情報で初期化
