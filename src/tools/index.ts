@@ -1,0 +1,29 @@
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { GetSheetsTool } from "./get-sheets.js";
+import { GetSheetValuesTool } from "./get-sheet-values.js";
+import type { IMCPTool } from "../types/index.js";
+
+/**
+ * ツール登録関数
+ * すべてのツールをサーバーに登録
+ * 
+ * @param server MCPサーバーインスタンス
+ */
+export function registerTools(server: McpServer): void {
+  const ALL_TOOLS: IMCPTool[] = [
+    new GetSheetsTool(),
+    new GetSheetValuesTool(),
+  ];
+
+  // 各ツールをサーバーに登録
+  for (const tool of ALL_TOOLS) {
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.parameters,
+      tool.execute.bind(tool)
+    );
+  }
+
+  console.error(`Registered ${ALL_TOOLS.length} tools`);
+}
