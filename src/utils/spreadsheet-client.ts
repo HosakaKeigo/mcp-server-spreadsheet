@@ -39,7 +39,7 @@ export class SpreadsheetClient {
 
       const spreadsheet = response.data;
       const title = spreadsheet.properties?.title || 'Untitled Spreadsheet';
-      
+
       // シート情報を整形
       const sheets: SheetInfo[] = spreadsheet.sheets?.map(sheet => {
         const properties = sheet.properties!;
@@ -80,7 +80,7 @@ export class SpreadsheetClient {
       // シートが存在するか確認
       const spreadsheetInfo = await this.getSpreadsheetInfo(spreadsheetId);
       const sheetExists = spreadsheetInfo.sheets.some(sheet => sheet.title === sheetName);
-      
+
       if (!sheetExists) {
         throw new Error(`Sheet "${sheetName}" does not exist in this spreadsheet`);
       }
@@ -132,7 +132,7 @@ export class SpreadsheetClient {
     if (a1Notation.includes('!')) {
       // シート名と範囲に分割
       const [, range] = a1Notation.split('!');
-      
+
       // 範囲のバリデーション
       if (range && !this.isValidRange(range)) {
         throw new Error(`Invalid A1 notation range: ${range}`);
@@ -152,17 +152,17 @@ export class SpreadsheetClient {
     // 基本的なA1記法のバリデーション（A1やA1:B2など）
     const a1Pattern = /^[A-Z]+[0-9]+$/;
     const a1RangePattern = /^[A-Z]+[0-9]+:[A-Z]+[0-9]+$/;
-    
+
     // 単一セル指定の場合
     if (a1Pattern.test(range)) {
       return true;
     }
-    
+
     // 範囲指定の場合
     if (range.includes(':')) {
       return a1RangePattern.test(range);
     }
-    
+
     return false;
   }
 }

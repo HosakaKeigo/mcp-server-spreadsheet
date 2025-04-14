@@ -10,7 +10,7 @@ import { extractSpreadsheetId } from '../utils/url-parser.js';
 export class GetSheetValuesTool implements IMCPTool {
   readonly name = "get_sheet_values";
   readonly description = "Get values from a specific sheet in a Google Spreadsheet";
-  
+
   readonly parameters = {
     spreadsheetUrl: z.string().describe("URL or ID of the Google Spreadsheet"),
     sheetName: z.string().describe("Name of the sheet to retrieve data from"),
@@ -32,10 +32,10 @@ export class GetSheetValuesTool implements IMCPTool {
    * @param args パラメータ
    * @returns 実行結果
    */
-  async execute(args: { 
-    spreadsheetUrl: string, 
-    sheetName: string, 
-    range?: string 
+  async execute(args: {
+    spreadsheetUrl: string,
+    sheetName: string,
+    range?: string
   }): Promise<{
     content: TextContent[];
     isError?: boolean;
@@ -43,14 +43,14 @@ export class GetSheetValuesTool implements IMCPTool {
     try {
       // URLからスプレッドシートIDを抽出
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
-      
+
       // シートの値を取得
       const values = await this.spreadsheetClient.getSheetValues(
         spreadsheetId,
         args.sheetName,
         args.range
       );
-      
+
       // 結果が空の場合
       if (values.length === 0) {
         return {
@@ -60,10 +60,10 @@ export class GetSheetValuesTool implements IMCPTool {
           }]
         };
       }
-      
+
       // 結果を整形
       const formattedResult = this.formatSheetValues(values, args.sheetName, args.range);
-      
+
       return {
         content: [{
           type: "text",
@@ -72,12 +72,12 @@ export class GetSheetValuesTool implements IMCPTool {
       };
     } catch (error) {
       console.error('Error executing get_sheet_values tool:', error);
-      
+
       // エラーメッセージを返す
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : 'Unknown error occurred while fetching sheet values';
-      
+
       return {
         content: [{
           type: "text",
@@ -156,12 +156,12 @@ export class GetSheetValuesTool implements IMCPTool {
   private columnIndexToLetter(index: number): string {
     let temp = index;
     let letter = '';
-    
+
     while (temp >= 0) {
       letter = String.fromCharCode(65 + (temp % 26)) + letter;
       temp = Math.floor(temp / 26) - 1;
     }
-    
+
     return letter;
   }
 }
