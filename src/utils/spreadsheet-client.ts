@@ -8,7 +8,7 @@ import type { SheetInfo, SpreadsheetInfo } from "../types/index.js";
 export class SpreadsheetClient {
   private sheets: sheets_v4.Sheets;
   // レスポンスサイズの上限（文字数）
-  private static readonly MAX_RESPONSE_SIZE = 200000;
+  private static readonly MAX_RESPONSE_SIZE = 10000;
 
   /**
    * クライアントをデフォルト認証情報で初期化
@@ -43,7 +43,7 @@ export class SpreadsheetClient {
       // シート情報を整形
       const sheets: SheetInfo[] =
         spreadsheet.sheets?.map((sheet) => {
-          const properties = sheet.properties!;
+          const properties = sheet.properties || {};
           return {
             title: properties.title || "Untitled Sheet",
             sheetId: properties.sheetId || 0,

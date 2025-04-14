@@ -93,7 +93,7 @@ export class GetSheetsTool implements IMCPTool {
 
       // 最後のシート以外は区切り線を追加
       if (index < info.sheets.length - 1) {
-        result += `\n`;
+        result += "\n";
       }
     });
 
