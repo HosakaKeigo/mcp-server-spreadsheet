@@ -1,6 +1,6 @@
 /**
  * GoogleスプレッドシートのURLからスプレッドシートIDを抽出する
- * 
+ *
  * @param url スプレッドシートのURL
  * @returns スプレッドシートID
  * @throws URLがGoogleスプレッドシートではない場合はエラー
@@ -13,7 +13,7 @@ export function extractSpreadsheetId(url: string): string {
     // 短縮URLフォーマット: https://docs.google.com/spreadsheets/d/{spreadsheetId}
     /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
     // すでにスプレッドシートIDのみの場合
-    /^([a-zA-Z0-9-_]+)$/
+    /^([a-zA-Z0-9-_]+)$/,
   ];
 
   for (const pattern of patterns) {
@@ -23,5 +23,5 @@ export function extractSpreadsheetId(url: string): string {
     }
   }
 
-  throw new Error('Invalid Google Spreadsheet URL or ID');
+  throw new Error("Invalid Google Spreadsheet URL or ID");
 }

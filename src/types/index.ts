@@ -11,7 +11,9 @@ export type InferZodParams<T extends Record<string, z.ZodType>> = {
 /**
  * MCPツールのインターフェース定義
  */
-export interface IMCPTool<TParams extends Record<string, z.ZodType> = Record<string, z.ZodType>> {
+export interface IMCPTool<
+  TParams extends Record<string, z.ZodType> = Record<string, z.ZodType>,
+> {
   /**
    * ツール名
    */

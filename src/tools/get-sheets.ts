@@ -1,8 +1,8 @@
-import { z } from 'zod';
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
-import type { IMCPTool, SpreadsheetInfo } from '../types/index.js';
-import { SpreadsheetClient } from '../utils/spreadsheet-client.js';
-import { extractSpreadsheetId } from '../utils/url-parser.js';
+import { z } from "zod";
+import type { IMCPTool, SpreadsheetInfo } from "../types/index.js";
+import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
+import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
  * スプレッドシート情報取得ツール
@@ -26,7 +26,7 @@ export class GetSheetsTool implements IMCPTool {
 
   /**
    * ツールの実行関数
-   * 
+   *
    * @param args パラメータ
    * @returns 実行結果
    */
@@ -39,38 +39,44 @@ export class GetSheetsTool implements IMCPTool {
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
 
       // スプレッドシート情報を取得
-      const spreadsheetInfo = await this.spreadsheetClient.getSpreadsheetInfo(spreadsheetId);
+      const spreadsheetInfo =
+        await this.spreadsheetClient.getSpreadsheetInfo(spreadsheetId);
 
       // 結果をテキストに整形
       const resultText = this.formatSpreadsheetInfo(spreadsheetInfo);
 
       return {
-        content: [{
-          type: "text",
-          text: resultText
-        }]
+        content: [
+          {
+            type: "text",
+            text: resultText,
+          },
+        ],
       };
     } catch (error) {
-      console.error('Error executing get_sheets tool:', error);
+      console.error("Error executing get_sheets tool:", error);
 
       // エラーメッセージを返す
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Unknown error occurred while fetching spreadsheet information';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unknown error occurred while fetching spreadsheet information";
 
       return {
-        content: [{
-          type: "text",
-          text: `Error: ${errorMessage}`
-        }],
-        isError: true
+        content: [
+          {
+            type: "text",
+            text: `Error: ${errorMessage}`,
+          },
+        ],
+        isError: true,
       };
     }
   }
 
   /**
    * スプレッドシート情報を見やすくフォーマットする
-   * 
+   *
    * @param info スプレッドシート情報
    * @returns フォーマットされたテキスト
    */
