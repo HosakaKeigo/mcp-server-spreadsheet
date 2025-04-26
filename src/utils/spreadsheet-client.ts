@@ -162,23 +162,17 @@ export class SpreadsheetClient {
       range: string;
       values: any[][];
     }>
-  ): Promise<{ totalUpdatedCells: number; totalUpdatedRanges: number }> {
+  ): Promise<{ totalUpdatedCells: number; totalUpdatedColumns: number; totalUpdatedRows: number }> {
     try {
       // 更新対象のシート名を全て収集
       const sheetNames = [...new Set(updates.map(update => update.sheetName))];
 
-      // すべてのシートの存在確認
+      // スプレッドシート情報を1回だけ取得（キャッシュ用）
       const spreadsheetInfo = await this.getSpreadsheetInfo(spreadsheetId);
-      for (const sheetName of sheetNames) {
-        const sheetExists = spreadsheetInfo.sheets.some(
-          (sheet) => sheet.title === sheetName
-        );
 
-        if (!sheetExists) {
-          throw new Error(
-            `Sheet "${sheetName}" does not exist in this spreadsheet`
-          );
-        }
+      // すべてのシートの存在確認
+      for (const sheetName of sheetNames) {
+        await this.validateSheetExists(spreadsheetInfo, sheetName);
       }
 
       // バッチ更新のデータを準備
@@ -213,11 +207,41 @@ export class SpreadsheetClient {
 
       return {
         totalUpdatedCells: response.data.totalUpdatedCells || 0,
-        totalUpdatedRanges: response.data.totalUpdatedRanges || 0
+        totalUpdatedColumns: response.data.totalUpdatedColumns || 0,
+        totalUpdatedRows: response.data.totalUpdatedRows || 0,
       };
     } catch (error) {
       console.error("Error batch updating cell values:", error);
       throw error;
+    }
+  }
+
+  /**
+   * シートの存在を確認する
+   *
+   * @param spreadsheetInfo スプレッドシート情報（または直接スプレッドシートID）
+   * @param sheetName 確認するシート名
+   * @throws シートが存在しない場合はエラー
+   */
+  private async validateSheetExists(
+    spreadsheetInfoOrId: SpreadsheetInfo | string,
+    sheetName: string
+  ): Promise<void> {
+    // スプレッドシート情報を取得（まだ取得されていない場合）
+    const spreadsheetInfo =
+      typeof spreadsheetInfoOrId === 'string'
+        ? await this.getSpreadsheetInfo(spreadsheetInfoOrId)
+        : spreadsheetInfoOrId;
+
+    // シートが存在するか確認
+    const sheetExists = spreadsheetInfo.sheets.some(
+      (sheet) => sheet.title === sheetName
+    );
+
+    if (!sheetExists) {
+      throw new Error(
+        `Sheet "${sheetName}" does not exist in this spreadsheet`
+      );
     }
   }
 
@@ -235,17 +259,11 @@ export class SpreadsheetClient {
     sheetName: string,
     range?: string
   ): Promise<string> {
-    // シートが存在するか確認
+    // スプレッドシート情報を取得
     const spreadsheetInfo = await this.getSpreadsheetInfo(spreadsheetId);
-    const sheetExists = spreadsheetInfo.sheets.some(
-      (sheet) => sheet.title === sheetName
-    );
 
-    if (!sheetExists) {
-      throw new Error(
-        `Sheet "${sheetName}" does not exist in this spreadsheet`
-      );
-    }
+    // シートの存在確認
+    await this.validateSheetExists(spreadsheetInfo, sheetName);
 
     // 範囲を構築
     let fullRange = sheetName;

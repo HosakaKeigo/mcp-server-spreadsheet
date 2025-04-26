@@ -87,7 +87,7 @@ export class BatchUpdateCellsTool implements IMCPTool {
         `- Sheet: "${update.sheetName}", Range: "${update.range}", Values: ${JSON.stringify(update.values)}`
       ).join("\n");
 
-      const message = `Successfully updated ${result.totalUpdatedCells} cells across ${result.totalUpdatedRanges} ranges.\n\nUpdates performed:\n${updatesInfo}`;
+      const message = `Successfully updated ${result.totalUpdatedCells} cells across ${result.totalUpdatedRows} rows.\n\nUpdates performed:\n${updatesInfo}`;
 
       return {
         content: [
