@@ -4,6 +4,7 @@ import { GetSheetValuesTool } from "./get-sheet-values.js";
 import { GetSheetsTool } from "./get-sheets.js";
 import { UpdateCellsTool } from "./update-cells.js";
 import { BatchUpdateCellsTool } from "./batch-update-cells.js";
+import { AddSheetTool } from "./add-sheet.js";
 
 /**
  * ツール登録関数
@@ -16,7 +17,8 @@ export function registerTools(server: McpServer): void {
     new GetSheetsTool(),
     new GetSheetValuesTool(),
     new UpdateCellsTool(),
-    new BatchUpdateCellsTool()
+    new BatchUpdateCellsTool(),
+    new AddSheetTool()
   ];
 
   // 各ツールをサーバーに登録

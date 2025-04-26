@@ -217,6 +217,78 @@ export class SpreadsheetClient {
   }
 
   /**
+   * 新しいシートをスプレッドシートに追加
+   *
+   * @param spreadsheetId スプレッドシートID
+   * @param sheetTitle 新しいシートのタイトル
+   * @param options オプション設定（行数、列数）
+   * @returns 作成されたシート情報
+   * @throws API呼び出しエラー、同名シートが存在する場合
+   */
+  async addSheet(
+    spreadsheetId: string,
+    sheetTitle: string,
+    options?: {
+      rowCount?: number;
+      columnCount?: number;
+    }
+  ): Promise<SheetInfo> {
+    try {
+      // デフォルト値の設定
+      const rowCount = options?.rowCount || 1000; // デフォルトの行数
+      const columnCount = options?.columnCount || 26; // デフォルトの列数
+
+      // スプレッドシート情報を取得して同名シートの存在確認
+      const spreadsheetInfo = await this.getSpreadsheetInfo(spreadsheetId);
+      const sheetExists = spreadsheetInfo.sheets.some(
+        (sheet) => sheet.title === sheetTitle
+      );
+
+      if (sheetExists) {
+        throw new Error(`Sheet with title "${sheetTitle}" already exists in this spreadsheet`);
+      }
+
+      // 新しいシートを追加するリクエスト
+      const response = await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              addSheet: {
+                properties: {
+                  title: sheetTitle,
+                  gridProperties: {
+                    rowCount: rowCount,
+                    columnCount: columnCount
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      // 作成されたシートのプロパティを取得
+      const createdSheet = response.data.replies?.[0].addSheet?.properties;
+      if (!createdSheet) {
+        throw new Error("Failed to retrieve created sheet properties");
+      }
+
+      // 新しいシート情報を整形して返す
+      return {
+        title: createdSheet.title || sheetTitle,
+        sheetId: createdSheet.sheetId || 0,
+        rowCount: createdSheet.gridProperties?.rowCount || rowCount,
+        columnCount: createdSheet.gridProperties?.columnCount || columnCount
+      };
+
+    } catch (error) {
+      console.error("Error adding new sheet:", error);
+      throw error;
+    }
+  }
+
+  /**
    * シートの存在を確認する
    *
    * @param spreadsheetInfo スプレッドシート情報（または直接スプレッドシートID）
