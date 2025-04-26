@@ -3,6 +3,7 @@ import type { IMCPTool } from "../types/index.js";
 import { GetSheetValuesTool } from "./get-sheet-values.js";
 import { GetSheetsTool } from "./get-sheets.js";
 import { UpdateCellsTool } from "./update-cells.js";
+import { BatchUpdateCellsTool } from "./batch-update-cells.js";
 
 /**
  * ツール登録関数
@@ -14,7 +15,9 @@ export function registerTools(server: McpServer): void {
   const ALL_TOOLS: IMCPTool[] = [
     new GetSheetsTool(),
     new GetSheetValuesTool(),
-    new UpdateCellsTool()];
+    new UpdateCellsTool(),
+    new BatchUpdateCellsTool()
+  ];
 
   // 各ツールをサーバーに登録
   for (const tool of ALL_TOOLS) {

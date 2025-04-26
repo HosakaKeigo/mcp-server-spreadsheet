@@ -148,6 +148,80 @@ export class SpreadsheetClient {
   }
 
   /**
+   * スプレッドシートの複数範囲のセル値を一括更新
+   *
+   * @param spreadsheetId スプレッドシートID
+   * @param updates 更新情報の配列（シート名、範囲、値のセット）
+   * @returns 更新された行数とセル数
+   * @throws API呼び出しエラー、シートが存在しない場合
+   */
+  async batchUpdateCellValues(
+    spreadsheetId: string,
+    updates: Array<{
+      sheetName: string;
+      range: string;
+      values: any[][];
+    }>
+  ): Promise<{ totalUpdatedCells: number; totalUpdatedRanges: number }> {
+    try {
+      // 更新対象のシート名を全て収集
+      const sheetNames = [...new Set(updates.map(update => update.sheetName))];
+
+      // すべてのシートの存在確認
+      const spreadsheetInfo = await this.getSpreadsheetInfo(spreadsheetId);
+      for (const sheetName of sheetNames) {
+        const sheetExists = spreadsheetInfo.sheets.some(
+          (sheet) => sheet.title === sheetName
+        );
+
+        if (!sheetExists) {
+          throw new Error(
+            `Sheet "${sheetName}" does not exist in this spreadsheet`
+          );
+        }
+      }
+
+      // バッチ更新のデータを準備
+      const data = updates.map(update => {
+        // 範囲を構築
+        let fullRange = update.sheetName;
+        if (update.range) {
+          if (update.range.includes("!")) {
+            fullRange = update.range;
+          } else {
+            fullRange = `${update.sheetName}!${update.range}`;
+          }
+        }
+
+        // A1記法の基本的なバリデーション
+        this.validateA1Notation(fullRange);
+
+        return {
+          range: fullRange,
+          values: update.values
+        };
+      });
+
+      // バッチ更新リクエスト
+      const response = await this.sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          valueInputOption: 'USER_ENTERED',
+          data: data
+        }
+      });
+
+      return {
+        totalUpdatedCells: response.data.totalUpdatedCells || 0,
+        totalUpdatedRanges: response.data.totalUpdatedRanges || 0
+      };
+    } catch (error) {
+      console.error("Error batch updating cell values:", error);
+      throw error;
+    }
+  }
+
+  /**
    * シートの存在確認と範囲の構築を行う共通処理
    *
    * @param spreadsheetId スプレッドシートID
