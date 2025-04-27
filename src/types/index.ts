@@ -2,37 +2,37 @@ import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { z } from "zod";
 
 /**
- * Zodスキーマから型を抽出するユーティリティ型
+ * Utility type to extract type from Zod schema
  */
 export type InferZodParams<T extends Record<string, z.ZodType>> = {
   [K in keyof T]: z.infer<T[K]>;
 };
 
 /**
- * MCPツールのインターフェース定義
+ * MCP Tool interface definition
  */
 export interface IMCPTool<
   TParams extends Record<string, z.ZodType> = Record<string, z.ZodType>,
 > {
   /**
-   * ツール名
+   * Tool name
    */
   readonly name: string;
 
   /**
-   * ツールの説明
+   * Tool description
    */
   readonly description: string;
 
   /**
-   * パラメータの定義
+   * Parameter definitions
    */
   readonly parameters: TParams;
 
   /**
-   * ツールを実行する
-   * @param args パラメータ
-   * @returns 実行結果
+   * Execute the tool
+   * @param args Parameters
+   * @returns Execution result
    */
   execute(args: InferZodParams<TParams>): Promise<{
     content: TextContent[];
@@ -41,7 +41,7 @@ export interface IMCPTool<
 }
 
 /**
- * スプレッドシート情報の型定義
+ * Spreadsheet information type definition
  */
 export interface SheetInfo {
   title: string;
@@ -51,7 +51,7 @@ export interface SheetInfo {
 }
 
 /**
- * スプレッドシート全体の情報
+ * Overall spreadsheet information
  */
 export interface SpreadsheetInfo {
   spreadsheetId: string;

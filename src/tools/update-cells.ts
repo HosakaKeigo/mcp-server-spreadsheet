@@ -5,7 +5,7 @@ import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
- * スプレッドシートのセル更新ツール
+ * Tool for updating cells in a spreadsheet
  */
 export class UpdateCellsTool implements IMCPTool {
   readonly name = "update_cells";
@@ -19,24 +19,24 @@ export class UpdateCellsTool implements IMCPTool {
     values: z
       .array(z.array(z.any()))
       .describe(
-        "2D array of values to write. Each inner array represents a row."
+        "2D array of values to write. Each inner array represents a row.",
       ),
   };
 
   private spreadsheetClient: SpreadsheetClient;
 
   /**
-   * ツールの初期化
+   * Initialize the tool
    */
   constructor() {
     this.spreadsheetClient = new SpreadsheetClient();
   }
 
   /**
-   * ツールの実行関数
+   * Tool execution function
    *
-   * @param args パラメータ
-   * @returns 実行結果
+   * @param args Parameters
+   * @returns Execution results
    */
   async execute(args: {
     spreadsheetUrl: string;
@@ -48,10 +48,10 @@ export class UpdateCellsTool implements IMCPTool {
     isError?: boolean;
   }> {
     try {
-      // URLからスプレッドシートIDを抽出
+      // Extract spreadsheet ID from URL
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
 
-      // 入力値の検証
+      // Validate input values
       if (!Array.isArray(args.values) || args.values.length === 0) {
         throw new Error("Values must be a non-empty 2D array");
       }
@@ -62,21 +62,22 @@ export class UpdateCellsTool implements IMCPTool {
         }
       }
 
-      // セルの値を更新
+      // Update cell values
       const result = await this.spreadsheetClient.updateCellValues(
         spreadsheetId,
         args.sheetName,
         args.range,
-        args.values
+        args.values,
       );
 
-      // 結果メッセージの作成
-      const message = `Successfully updated ${result.updatedCells} cells across ${result.updatedRows
-        } rows in sheet "${args.sheetName}" at range "${args.range}".\n\nValues updated: ${JSON.stringify(
-          args.values,
-          null,
-          2
-        )}`;
+      // Create result message
+      const message = `Successfully updated ${result.updatedCells} cells across ${
+        result.updatedRows
+      } rows in sheet "${args.sheetName}" at range "${args.range}".\n\nValues updated: ${JSON.stringify(
+        args.values,
+        null,
+        2,
+      )}`;
 
       return {
         content: [
@@ -89,7 +90,7 @@ export class UpdateCellsTool implements IMCPTool {
     } catch (error) {
       console.error("Error executing update_cells tool:", error);
 
-      // エラーメッセージを返す
+      // Return error message
       const errorMessage =
         error instanceof Error
           ? error.message

@@ -5,7 +5,7 @@ import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
- * スプレッドシート情報取得ツール
+ * Tool for retrieving spreadsheet information
  */
 export class GetSheetsTool implements IMCPTool {
   readonly name = "get_sheets";
@@ -18,31 +18,31 @@ export class GetSheetsTool implements IMCPTool {
   private spreadsheetClient: SpreadsheetClient;
 
   /**
-   * ツールの初期化
+   * Initialize the tool
    */
   constructor() {
     this.spreadsheetClient = new SpreadsheetClient();
   }
 
   /**
-   * ツールの実行関数
+   * Tool execution function
    *
-   * @param args パラメータ
-   * @returns 実行結果
+   * @param args Parameters
+   * @returns Execution results
    */
   async execute(args: { spreadsheetUrl: string }): Promise<{
     content: TextContent[];
     isError?: boolean;
   }> {
     try {
-      // URLからスプレッドシートIDを抽出
+      // Extract spreadsheet ID from URL
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
 
-      // スプレッドシート情報を取得
+      // Retrieve spreadsheet information
       const spreadsheetInfo =
         await this.spreadsheetClient.getSpreadsheetInfo(spreadsheetId);
 
-      // 結果をテキストに整形
+      // Format the results as text
       const resultText = this.formatSpreadsheetInfo(spreadsheetInfo);
 
       return {
@@ -56,7 +56,7 @@ export class GetSheetsTool implements IMCPTool {
     } catch (error) {
       console.error("Error executing get_sheets tool:", error);
 
-      // エラーメッセージを返す
+      // Return error message
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -75,23 +75,23 @@ export class GetSheetsTool implements IMCPTool {
   }
 
   /**
-   * スプレッドシート情報を見やすくフォーマットする
+   * Format spreadsheet information for better readability
    *
-   * @param info スプレッドシート情報
-   * @returns フォーマットされたテキスト
+   * @param info Spreadsheet information
+   * @returns Formatted text
    */
   private formatSpreadsheetInfo(info: SpreadsheetInfo): string {
     let result = `Spreadsheet: ${info.title} (ID: ${info.spreadsheetId})\n\n`;
     result += `Total sheets: ${info.sheets.length}\n\n`;
 
-    // 各シートの情報を追加
+    // Add information for each sheet
     info.sheets.forEach((sheet, index) => {
       result += `Sheet ${index + 1}: ${sheet.title}\n`;
       result += `  - Rows: ${sheet.rowCount}\n`;
       result += `  - Columns: ${sheet.columnCount}\n`;
       result += `  - Sheet ID: ${sheet.sheetId}\n`;
 
-      // 最後のシート以外は区切り線を追加
+      // Add separator line for all but the last sheet
       if (index < info.sheets.length - 1) {
         result += "\n";
       }

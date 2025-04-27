@@ -5,7 +5,7 @@ import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
- * スプレッドシートのセル一括更新ツール
+ * Tool for batch updating cells in a spreadsheet
  */
 export class BatchUpdateCellsTool implements IMCPTool {
   readonly name = "batch_update_cells";
@@ -22,9 +22,9 @@ export class BatchUpdateCellsTool implements IMCPTool {
           values: z
             .array(z.array(z.any()))
             .describe(
-              "2D array of values to write. Each inner array represents a row."
+              "2D array of values to write. Each inner array represents a row.",
             ),
-        })
+        }),
       )
       .describe("An array of update operations to perform"),
   };
@@ -32,17 +32,17 @@ export class BatchUpdateCellsTool implements IMCPTool {
   private spreadsheetClient: SpreadsheetClient;
 
   /**
-   * ツールの初期化
+   * Initialize the tool
    */
   constructor() {
     this.spreadsheetClient = new SpreadsheetClient();
   }
 
   /**
-   * ツールの実行関数
+   * Tool execution function
    *
-   * @param args パラメータ
-   * @returns 実行結果
+   * @param args Parameters
+   * @returns Execution results
    */
   async execute(args: {
     spreadsheetUrl: string;
@@ -56,36 +56,43 @@ export class BatchUpdateCellsTool implements IMCPTool {
     isError?: boolean;
   }> {
     try {
-      // URLからスプレッドシートIDを抽出
+      // Extract spreadsheet ID from URL
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
 
-      // 入力値の検証
+      // Validate input values
       if (!Array.isArray(args.updates) || args.updates.length === 0) {
         throw new Error("Updates must be a non-empty array");
       }
 
       for (const update of args.updates) {
         if (!Array.isArray(update.values) || update.values.length === 0) {
-          throw new Error(`Values for range ${update.range} must be a non-empty 2D array`);
+          throw new Error(
+            `Values for range ${update.range} must be a non-empty 2D array`,
+          );
         }
 
         for (const row of update.values) {
           if (!Array.isArray(row)) {
-            throw new Error(`Each row for range ${update.range} must be an array`);
+            throw new Error(
+              `Each row for range ${update.range} must be an array`,
+            );
           }
         }
       }
 
-      // セルの値を一括更新
+      // Batch update cell values
       const result = await this.spreadsheetClient.batchUpdateCellValues(
         spreadsheetId,
-        args.updates
+        args.updates,
       );
 
-      // 結果メッセージの作成
-      const updatesInfo = args.updates.map(update =>
-        `- Sheet: "${update.sheetName}", Range: "${update.range}", Values: ${JSON.stringify(update.values)}`
-      ).join("\n");
+      // Create result message
+      const updatesInfo = args.updates
+        .map(
+          (update) =>
+            `- Sheet: "${update.sheetName}", Range: "${update.range}", Values: ${JSON.stringify(update.values)}`,
+        )
+        .join("\n");
 
       const message = `Successfully updated ${result.totalUpdatedCells} cells across ${result.totalUpdatedRows} rows.\n\nUpdates performed:\n${updatesInfo}`;
 
@@ -100,7 +107,7 @@ export class BatchUpdateCellsTool implements IMCPTool {
     } catch (error) {
       console.error("Error executing batch_update_cells tool:", error);
 
-      // エラーメッセージを返す
+      // Return error message
       const errorMessage =
         error instanceof Error
           ? error.message

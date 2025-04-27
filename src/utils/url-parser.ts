@@ -1,24 +1,24 @@
 /**
- * GoogleスプレッドシートのURLからスプレッドシートIDを抽出する
+ * Extract spreadsheet ID from a Google Spreadsheet URL
  *
- * @param url スプレッドシートのURL
- * @returns スプレッドシートID
- * @throws URLがGoogleスプレッドシートではない場合はエラー
+ * @param url Google Spreadsheet URL
+ * @returns Spreadsheet ID
+ * @throws Error if URL is not a valid Google Spreadsheet
  */
 export function extractSpreadsheetId(url: string): string {
-  // URLが正規表現にマッチするか確認
+  // Check if URL matches the regular expression
   const patterns = [
-    // 通常のURLフォーマット: https://docs.google.com/spreadsheets/d/{spreadsheetId}/edit
+    // Normal URL format: https://docs.google.com/spreadsheets/d/{spreadsheetId}/edit
     /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)(?:\/|$|\?)/,
-    // 短縮URLフォーマット: https://docs.google.com/spreadsheets/d/{spreadsheetId}
+    // Shortened URL format: https://docs.google.com/spreadsheets/d/{spreadsheetId}
     /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
-    // すでにスプレッドシートIDのみの場合
+    // If already just a spreadsheet ID
     /^([a-zA-Z0-9-_]+)$/,
   ];
 
   for (const pattern of patterns) {
     const match = url.match(pattern);
-    if (match && match[1]) {
+    if (match?.[1]) {
       return match[1];
     }
   }

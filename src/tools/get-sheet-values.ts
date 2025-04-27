@@ -5,7 +5,7 @@ import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
- * スプレッドシートの値取得ツール
+ * Tool for retrieving values from a spreadsheet
  */
 export class GetSheetValuesTool implements IMCPTool {
   readonly name = "get_sheet_values";
@@ -24,17 +24,17 @@ export class GetSheetValuesTool implements IMCPTool {
   private spreadsheetClient: SpreadsheetClient;
 
   /**
-   * ツールの初期化
+   * Initialize the tool
    */
   constructor() {
     this.spreadsheetClient = new SpreadsheetClient();
   }
 
   /**
-   * ツールの実行関数
+   * Tool execution function
    *
-   * @param args パラメータ
-   * @returns 実行結果
+   * @param args Parameters
+   * @returns Execution results
    */
   async execute(args: {
     spreadsheetUrl: string;
@@ -45,17 +45,17 @@ export class GetSheetValuesTool implements IMCPTool {
     isError?: boolean;
   }> {
     try {
-      // URLからスプレッドシートIDを抽出
+      // Extract spreadsheet ID from URL
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
 
-      // シートの値を取得
+      // Get sheet values
       const values = await this.spreadsheetClient.getSheetValues(
         spreadsheetId,
         args.sheetName,
-        args.range
+        args.range,
       );
 
-      // 結果が空の場合
+      // Handle empty results
       if (values.length === 0) {
         return {
           content: [
@@ -67,11 +67,11 @@ export class GetSheetValuesTool implements IMCPTool {
         };
       }
 
-      // 結果を整形
+      // Format the results
       const formattedResult = this.formatSheetValues(
         values,
         args.sheetName,
-        args.range
+        args.range,
       );
 
       return {
@@ -85,7 +85,7 @@ export class GetSheetValuesTool implements IMCPTool {
     } catch (error) {
       console.error("Error executing get_sheet_values tool:", error);
 
-      // エラーメッセージを返す
+      // Return error message
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -104,37 +104,37 @@ export class GetSheetValuesTool implements IMCPTool {
   }
 
   /**
-   * シートの値を見やすくフォーマットする
+   * Format sheet values for better readability
    *
-   * @param values シートの値
-   * @param sheetName シート名
-   * @param range 範囲（オプション）
-   * @returns フォーマットされたテキスト
+   * @param values Sheet values
+   * @param sheetName Sheet name
+   * @param range Range (optional)
+   * @returns Formatted text
    */
   private formatSheetValues(
     values: any[][],
     sheetName: string,
-    range?: string
+    range?: string,
   ): string {
     const rowCount = values.length;
     const colCount = values.reduce((max, row) => Math.max(max, row.length), 0);
 
-    // ヘッダー情報
+    // Header information
     let result = `Data from sheet "${sheetName}"${range ? ` range ${range}` : ""}\n`;
     result += `Rows: ${rowCount}, Columns: ${colCount}\n\n`;
 
-    // テーブル形式に整形
-    // 各列の最大幅を計算
+    // Format as a table
+    // Calculate maximum width for each column
     const colWidths: number[] = [];
     for (let col = 0; col < colCount; col++) {
       const colValues = values.map((row) => String(row[col] ?? ""));
       colWidths[col] = Math.min(
-        50, // 最大列幅を制限
-        Math.max(3, ...colValues.map((val) => val.length))
+        50, // Limit maximum column width
+        Math.max(3, ...colValues.map((val) => val.length)),
       );
     }
 
-    // ヘッダー行（A, B, C, ...）を追加
+    // Add header row (A, B, C, ...)
     result += "|";
     for (let col = 0; col < colCount; col++) {
       const colLetter = this.columnIndexToLetter(col);
@@ -142,23 +142,23 @@ export class GetSheetValuesTool implements IMCPTool {
     }
     result += "\n";
 
-    // 区切り線
+    // Add separator line
     result += "|";
     for (let col = 0; col < colCount; col++) {
-      result += "-".repeat(colWidths[col] + 2) + "|";
+      result += `${"-".repeat(colWidths[col] + 2)}|`;
     }
     result += "\n";
 
-    // データ行
+    // Add data rows
     for (let row = 0; row < rowCount; row++) {
       result += "|";
       for (let col = 0; col < colCount; col++) {
         const cellValue =
           values[row][col] !== undefined ? String(values[row][col]) : "";
-        // セル値が長い場合は省略
+        // Abbreviate cell values that are too long
         const formattedValue =
           cellValue.length > colWidths[col]
-            ? cellValue.substring(0, colWidths[col] - 3) + "..."
+            ? `${cellValue.substring(0, colWidths[col] - 3)}...`
             : cellValue;
         result += ` ${formattedValue.padEnd(colWidths[col])} |`;
       }
@@ -169,10 +169,10 @@ export class GetSheetValuesTool implements IMCPTool {
   }
 
   /**
-   * 列インデックスをA1記法の列文字（A, B, C, ...）に変換
+   * Convert column index to A1 notation column letter (A, B, C, ...)
    *
-   * @param index 0からのインデックス
-   * @returns 列文字
+   * @param index Zero-based index
+   * @returns Column letter
    */
   private columnIndexToLetter(index: number): string {
     let temp = index;

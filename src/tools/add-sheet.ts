@@ -5,34 +5,41 @@ import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
- * スプレッドシートに新しいシートを追加するツール
+ * Tool to add a new sheet to a spreadsheet
  */
 export class AddSheetTool implements IMCPTool {
   readonly name = "add_sheet";
-  readonly description =
-    "Add a new sheet to a Google Spreadsheet";
+  readonly description = "Add a new sheet to a Google Spreadsheet";
 
   readonly parameters = {
     spreadsheetUrl: z.string().describe("URL or ID of the Google Spreadsheet"),
     sheetTitle: z.string().describe("Title for the new sheet"),
-    rowCount: z.number().positive().optional().describe("Number of rows for the new sheet (default: 1000)"),
-    columnCount: z.number().positive().optional().describe("Number of columns for the new sheet (default: 26)"),
+    rowCount: z
+      .number()
+      .positive()
+      .optional()
+      .describe("Number of rows for the new sheet (default: 1000)"),
+    columnCount: z
+      .number()
+      .positive()
+      .optional()
+      .describe("Number of columns for the new sheet (default: 26)"),
   };
 
   private spreadsheetClient: SpreadsheetClient;
 
   /**
-   * ツールの初期化
+   * Initialize the tool
    */
   constructor() {
     this.spreadsheetClient = new SpreadsheetClient();
   }
 
   /**
-   * ツールの実行関数
+   * Tool execution function
    *
-   * @param args パラメータ
-   * @returns 実行結果
+   * @param args Parameters
+   * @returns Execution results
    */
   async execute(args: {
     spreadsheetUrl: string;
@@ -44,28 +51,28 @@ export class AddSheetTool implements IMCPTool {
     isError?: boolean;
   }> {
     try {
-      // URLからスプレッドシートIDを抽出
+      // Extract spreadsheet ID from URL
       const spreadsheetId = extractSpreadsheetId(args.spreadsheetUrl);
 
-      // シートのタイトルを検証
+      // Validate sheet title
       if (!args.sheetTitle || args.sheetTitle.trim() === "") {
         throw new Error("Sheet title cannot be empty");
       }
 
-      // オプションの行数と列数
+      // Optional row and column counts
       const options = {
         rowCount: args.rowCount,
-        columnCount: args.columnCount
+        columnCount: args.columnCount,
       };
 
-      // 新しいシートを追加
+      // Add new sheet
       const newSheet = await this.spreadsheetClient.addSheet(
         spreadsheetId,
         args.sheetTitle,
-        options
+        options,
       );
 
-      // 結果メッセージの作成
+      // Create result message
       const message = `Successfully added new sheet "${newSheet.title}" to the spreadsheet.\n\nSheet details:\n- Sheet ID: ${newSheet.sheetId}\n- Rows: ${newSheet.rowCount}\n- Columns: ${newSheet.columnCount}`;
 
       return {
@@ -79,7 +86,7 @@ export class AddSheetTool implements IMCPTool {
     } catch (error) {
       console.error("Error executing add_sheet tool:", error);
 
-      // エラーメッセージを返す
+      // Return error message
       const errorMessage =
         error instanceof Error
           ? error.message
