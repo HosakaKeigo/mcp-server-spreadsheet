@@ -79,6 +79,7 @@ To use this server with Claude for Desktop:
          "command": "node",
          "args": ["/absolute/path/to/mcp-server-spreadsheet/build/index.js"],
          "env": {
+           "GOOGLE_PROJECT_ID": "your-google-project-id",
            "GOOGLE_APPLICATION_CREDENTIALS": "/absolute/path/to/your/credentials.json"
          }
        }
