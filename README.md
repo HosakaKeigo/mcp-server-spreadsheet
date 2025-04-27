@@ -42,6 +42,10 @@ This server uses Google Cloud's Application Default Credentials for authenticati
    gcloud auth application-default login --scopes=openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/spreadsheets
    ```
 
+>[!Tip]
+>- Ensure your Google Project's Sheet API is enabled.
+>- Don't forget `--scopes` option for `gcloud auth application-default login`
+
 ## Building and Running
 
 1. Build the project:
