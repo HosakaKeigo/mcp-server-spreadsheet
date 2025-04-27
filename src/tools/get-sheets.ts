@@ -1,6 +1,10 @@
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import type { IMCPTool, SpreadsheetInfo } from "../types/index.js";
+import type {
+  IMCPTool,
+  InferZodParams,
+  SpreadsheetInfo,
+} from "../types/index.js";
 import type { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
@@ -27,7 +31,7 @@ export class GetSheetsTool implements IMCPTool {
    * @param args Parameters
    * @returns Execution results
    */
-  async execute(args: { spreadsheetUrl: string }): Promise<{
+  async execute(args: InferZodParams<typeof this.parameters>): Promise<{
     content: TextContent[];
     isError?: boolean;
   }> {
