@@ -1,7 +1,7 @@
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import type { IMCPTool } from "../types/index.js";
-import { SpreadsheetClient } from "../utils/spreadsheet-client.js";
+import type { SpreadsheetClient } from "../utils/spreadsheet-client.js";
 import { extractSpreadsheetId } from "../utils/url-parser.js";
 
 /**
@@ -23,14 +23,11 @@ export class UpdateCellsTool implements IMCPTool {
       ),
   };
 
-  private spreadsheetClient: SpreadsheetClient;
-
   /**
-   * Initialize the tool
+   * Initialize the tool with injected dependencies
+   * @param spreadsheetClient SpreadsheetClient instance
    */
-  constructor() {
-    this.spreadsheetClient = new SpreadsheetClient();
-  }
+  constructor(private readonly spreadsheetClient: SpreadsheetClient) {}
 
   /**
    * Tool execution function

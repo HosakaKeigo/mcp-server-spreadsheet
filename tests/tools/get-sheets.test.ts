@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GetSheetsTool } from "../../src/tools/get-sheets";
-import { SpreadsheetClient } from "../../src/utils/spreadsheet-client";
+import type { SpreadsheetClient } from "../../src/utils/spreadsheet-client";
 import { extractSpreadsheetId } from "../../src/utils/url-parser";
 
 // Mock for url-parser
@@ -11,23 +11,25 @@ vi.mock("../../src/utils/url-parser", () => ({
 // Mock for SpreadsheetClient
 vi.mock("../../src/utils/spreadsheet-client", () => {
   return {
-    SpreadsheetClient: vi.fn().mockImplementation(() => ({
-      getSpreadsheetInfo: vi.fn(),
-    })),
+    SpreadsheetClient: vi.fn(),
   };
 });
 
 describe("GetSheetsTool", () => {
   let tool: GetSheetsTool;
-  let mockClient: { getSpreadsheetInfo: ReturnType<typeof vi.fn> };
+  let mockClient: SpreadsheetClient;
 
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
 
-    // Create instance for testing
-    tool = new GetSheetsTool();
-    mockClient = (tool as any).spreadsheetClient;
+    // Create mock spreadsheet client
+    mockClient = {
+      getSpreadsheetInfo: vi.fn(),
+    } as unknown as SpreadsheetClient;
+
+    // Create instance for testing with injected mock client
+    tool = new GetSheetsTool(mockClient);
   });
 
   it("should initialize with correct properties", () => {
@@ -51,7 +53,9 @@ describe("GetSheetsTool", () => {
 
     // Configure mock behavior
     vi.mocked(extractSpreadsheetId).mockReturnValue(mockSpreadsheetId);
-    mockClient.getSpreadsheetInfo.mockResolvedValue(mockSpreadsheetInfo);
+    vi.mocked(mockClient.getSpreadsheetInfo).mockResolvedValue(
+      mockSpreadsheetInfo,
+    );
 
     // Execute test
     const result = await tool.execute({
