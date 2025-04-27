@@ -74,6 +74,11 @@ export class BatchUpdateCellsTool implements IMCPTool {
               `Each row for range ${update.range} must be an array`,
             );
           }
+          if (row.length === 0) {
+            throw new Error(
+              `Each row for range ${update.range} must be a non-empty array`,
+            );
+          }
         }
       }
 

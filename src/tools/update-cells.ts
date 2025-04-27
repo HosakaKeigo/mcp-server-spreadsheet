@@ -53,10 +53,11 @@ export class UpdateCellsTool implements IMCPTool {
         throw new Error("Values must be a non-empty 2D array");
       }
 
-      for (const row of args.values) {
-        if (!Array.isArray(row)) {
-          throw new Error("Each row must be an array");
-        }
+      const hasEmptyRows = args.values.some(
+        (row) => !Array.isArray(row) || row.length === 0,
+      );
+      if (hasEmptyRows) {
+        throw new Error("Each row in values must be a non-empty array");
       }
 
       // Update cell values
