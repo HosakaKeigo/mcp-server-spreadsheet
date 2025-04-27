@@ -38,7 +38,7 @@ This server provides the following tools for working with Google Spreadsheets:
 
 ## Authentication Setup
 
-This server uses Google Cloud's Application Default Credentials for authentication to access Google Sheets. You have two options for setting up authentication:
+This server uses Google Cloud's Application Default Credentials for authentication to access Google Sheets.
 
 1. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) if you haven't already
 2. Log in and authorize access to Google Sheets:
