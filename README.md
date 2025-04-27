@@ -2,6 +2,10 @@
 
 A Model Context Protocol (MCP) server implementation that integrates with Google Spreadsheets, allowing AI assistants to retrieve and modify spreadsheet data. This server enables Claude to interact with your Google Sheets data directly.
 
+## Demo
+
+![Demo of using Google Sheets with Claude](assets/demo.gif)
+
 ## Features
 
 This server provides the following tools for working with Google Spreadsheets:
