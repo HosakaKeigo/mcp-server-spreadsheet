@@ -19,7 +19,6 @@
   "javascript": {
     "formatter": {
       "quoteStyle": "double",
-      "trailingComma": "es5",
       "semicolons": "always"
     }
   }
